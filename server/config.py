@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
+from flask_bcrypt import Bcrypt
 
 # Local imports
 
@@ -26,6 +27,10 @@ db.init_app(app)
 
 # Instantiate REST API
 api = Api(app)
+bcrypt=Bcrypt(app)
 
 # Instantiate CORS
 CORS(app)
+
+#secret key
+app.secret_key = b'\x14\xf4\x9c\xcf\xa7\xc3\r\x81\x18\xe5\xfe9\xde\x03Q\xbe'

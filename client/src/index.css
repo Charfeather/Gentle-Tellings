@@ -5,3 +5,24 @@
   --text: hsla(0, 0%, 100%, 0.88);
 }
 
+.nav_menu {
+  overflow: hidden;
+  background-color: rgb(97, 97, 108);
+  height: 45px;
+  display:flex;
+  justify-content:center;
+}
+.nav_menu a {
+  float: none;
+  display: inline-block;
+  color: white;
+  text-align: center;
+  padding: 15px 40px;
+  text-decoration: none;
+  font-size: 30px;
+}
+
+.nav_menu a:hover {
+  background-color: white;
+  color: green;
+}
