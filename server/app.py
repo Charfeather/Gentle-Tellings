@@ -9,10 +9,28 @@ from flask_restful import Resource
 # Local imports
 from config import app, db, api
 # Add your model imports
-from models import User,Message
+from models import User,Message,Response
 
 
 # Views go here!
+
+class Responsesbyid(Resource):
+    def delete(self,id):
+        response=Response.query.get(id)
+        db.session.delete(response)
+        db.session.commit()
+        return make_response('',204)
+api.add_resource(Responsesbyid,'/api/v1/responses/<int:id>')
+
+class Responses(Resource):
+    def post(self):
+        data=request.get_json()
+        response=Response(content=data['content'],user_id=data['user_id'],message_id=data['message_id'])
+        db.session.add(response)
+        db.session.commit()
+        return make_response({'response':response.to_dict()},201)
+api.add_resource(Responses,'/api/v1/responses')
+
 class Messages(Resource):
     def get(self):
         messages=[e.to_dict() for e in Message.query.all()]
@@ -108,6 +126,37 @@ def logout():
 def index():
     return '<h1>Project Server</h1>'
 
+#this is how friends are added
+@app.route('/api/v1/add_friend/<int:user_id>/<int:friend_id>',methods={'POST'})
+def add_friend(user_id,friend_id):
+    user=User.query.get(user_id)
+    friend=User.query.get(friend_id)
+
+    if user is None or friend is None:
+        return  make_response({'error':'User or friend not found'},404)
+    
+    if friend in user.friends or friend in user.friend_of:
+        return make_response({'message':'Friendship already exists'},200)
+    
+    if friend==user:
+        return make_response({'error':'User cannot friend themself'},400)
+    user.friends.append(friend)
+    db.session.commit()
+    return make_response({'message':'Friend has been added'},201)
+
+@app.route('/api/v1/delete_friend/<int:user_id>/<int:friend_id>',methods={'DELETE'})
+def delete_friend(user_id,friend_id):
+    user=User.query.get(user_id)
+    friend=User.query.get(friend_id)
+
+    if user is None or friend is None:
+        return make_response({'error':'User or friend not found'},404)
+
+    if friend not in user.friends:
+        return make_response({'message':'Friendship does not exist'},200)
+    user.friends.remove(friend)
+    db.session.commit()
+    return make_response('',204)
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)

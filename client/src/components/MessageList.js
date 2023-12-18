@@ -37,7 +37,6 @@ function MessageList(){
         }
         fetchData()
     },[])
-    const [editmode,setEditMode]=useState(false)
     const render=data.map((message)=>{
         return(
             <Messagerender key={message.id} message={message} userdata={userdata}/>

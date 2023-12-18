@@ -4,9 +4,17 @@ import { Switch, Route } from "react-router-dom";
 import Signup from "./Signup";
 import { Button } from "@mui/material";
 import Navbar from "./Navbar";
-import MessageList from "./MessageList";
+import HourlyMessage from "./Hourlymessage";
 
 function App() {
+  const [message,setmessage]=useState([])
+  const [number,setNumber]=useState([])
+  const messageList=[]
+
+  function messagePicker(){
+    return Math.floor(Math.random() * messageList.length)+1
+  }
+  
   function logOut(){
     fetch('/logout',{
       method:'DELETE'
@@ -34,7 +42,38 @@ function App() {
         console.log('error')
       }
     })
-  },[])
+
+    const allMessage=async()=>{
+      try{
+        const response=await fetch(`/messages`)
+        const data=await response.json()
+        data.map((data)=>{
+          messageList.push(data)
+        })
+        console.log(messageList)
+      }catch(error){console.error("error",error)}
+      setNumber(messagePicker())
+    }
+    allMessage()
+    
+    
+    const fetchData=async()=>{
+      console.log(number)
+      try{
+          const response=await fetch(`/messages/${number}`)
+          const data=await response.json()
+          setmessage(data)
+      }catch(error){console.error("error",error)}
+  }
+  fetchData()
+
+  const interval=setInterval(()=>{
+    fetchData();
+  },3600000);
+
+  return()=>clearInterval(interval)
+
+  },[number])
 
   const [user,setUser]=useState(null)
    if (!user){
@@ -46,6 +85,9 @@ function App() {
     <h1>Hello {user.username}</h1>
     <Button variant="contained" onClick={logOut}>Log Out</Button>
     <Navbar user={user} setUser={setUser}/>
+    <div>
+      <HourlyMessage message={message} user={user} number={number}/>
+    </div>
   </div>
   )
 }

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
-import Navbar from "./Navbar"
-import {TextField} from "@mui/material"
 import SearchBar from "./SearchBar"
-import Userpage from "./Userpage"
+import Userpage from "./Usersearchpop"
+import UserProfile from "./UserProfile"
 
 function Usersearch() {
   const location = useLocation()
   const userData = location.state
   const [data,setData]=useState([])
   const [search,setSearch]=useState("")
+  const [userpage,setUserPage]=useState(null)
   useEffect(()=>{
     const fetchData=async()=>{
         try{
@@ -20,24 +20,31 @@ function Usersearch() {
     }
     fetchData()
 },[])
-const render=data.filter((data)=>
+const userrender=data.filter((data)=>
 data.username.toLowerCase().includes(search)).
-map((data)=>{return <Userpage user={data}/>})
+map((data)=>{return <Userpage key={data.id} user={data} setPage={setUserPage} userpage={userpage}/>})
 
-  return (
-    <div>
-      <h1>Time to search for a user, {userData.username}</h1>
+
+  if(userpage===null){
+    return (
       <div>
-        <div className="nav_menu">
-            <a href="/">Go Home</a>
+        <h1>Time to search for a user, {userData.username}</h1>
+        <div>
+          <div className="nav_menu">
+              <a href="/">Go Home</a>
+          </div>
+        </div>
+        <SearchBar setSearch={setSearch}/>
+        <div className='username-container'>
+          {userrender}
         </div>
       </div>
-      <SearchBar setSearch={setSearch}/>
-      <div className='username-container'>
-        {render}
-      </div>
-    </div>
-  )
+    )
+  }else{
+    return(
+      <UserProfile userpage={userpage} userData={userData}/>
+    )
+  }
 }
 
 export default Usersearch
