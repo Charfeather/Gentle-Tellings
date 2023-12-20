@@ -28,7 +28,7 @@ function UserFriendlist({ userpage, userData, setFriend }) {
       ];
   
       const friendList = friendUsernames.map((username, index) => (
-        <div key={index}>
+        <div key={index} className='flex justify-center font-mono'>
           <h3>{username}</h3>
         </div>
       ));

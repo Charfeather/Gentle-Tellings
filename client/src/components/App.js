@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import { Switch, Route } from "react-router-dom";
 
 import Signup from "./Signup";
-import { Button } from "@mui/material";
+import { Button, outlinedInputClasses } from "@mui/material";
 import Navbar from "./Navbar";
 import HourlyMessage from "./Hourlymessage";
 
 function App() {
   const [message,setmessage]=useState([])
   const [number,setNumber]=useState([])
+  const [update,setUpdate]=useState(false)
   const messageList=[]
 
   function messagePicker(){
@@ -58,7 +59,6 @@ function App() {
     
     
     const fetchData=async()=>{
-      console.log(number)
       try{
           const response=await fetch(`/messages/${number}`)
           const data=await response.json()
@@ -67,11 +67,11 @@ function App() {
   }
   fetchData()
 
-  const interval=setInterval(()=>{
-    fetchData();
-  },3600000);
+  // const interval=setInterval(()=>{
+  //   fetchData();
+  // },3600000);
 
-  return()=>clearInterval(interval)
+  // return()=>clearInterval(interval)
 
   },[number])
 
@@ -81,11 +81,11 @@ function App() {
    }
   
   return(
-  <div>
-    <h1>Hello {user.username}</h1>
-    <Button variant="contained" onClick={logOut}>Log Out</Button>
+  <div className="h-screen bg-stone-300">
     <Navbar user={user} setUser={setUser}/>
-    <div>
+    <Button variant="contained" onClick={logOut}>Log Out</Button>
+    <h1 className="text-3xl font-bold flex justify-center font-mono absolute inset-x-0 bottom-0 h-4/6">Hello, {user.username}</h1>
+    <div className="flex justify-center text-2xl font-mono font-black absolute inset-x-0 bottom-0 h-3/5">
       <HourlyMessage message={message} user={user} number={number}/>
     </div>
   </div>

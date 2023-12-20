@@ -1,5 +1,6 @@
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.orm import validates
 
 from config import db,bcrypt
 
@@ -30,6 +31,16 @@ class User(db.Model,SerializerMixin):
         lazy='dynamic'
     )
 
+    @validates('username')
+    def validate_username(self, key, username):
+        if self.id is not None:
+            return username
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            raise ValueError('Username already in use')
+        else:
+            return username
+
     @property
     def password_hash(self):
         return self._password_hash
@@ -58,6 +69,13 @@ class Message(db.Model,SerializerMixin):
     user=db.relationship('User',back_populates='messages')
     responses=db.relationship('Response',back_populates='message',cascade='all, delete-orphan')
 
+    @validates('content')
+    def validate_content(self,key,content):
+        if len(content)>3:
+            return content
+        else:
+            raise ValueError('Has to be more than 3 characters')
+
 class Response(db.Model,SerializerMixin):
     __tablename__='responses'
 
@@ -71,3 +89,10 @@ class Response(db.Model,SerializerMixin):
     updated_at=db.Column(db.DateTime,server_default=db.func.now(), onupdate=db.func.now())
     user=db.relationship('User',back_populates='responses')
     message=db.relationship('Message',back_populates='responses')
+
+    @validates('content')
+    def validate_content(self,key,content):
+        if len(content)>3:
+            return content
+        else:
+            raise ValueError('Has to be more than 3 characters')

@@ -1,11 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@mui/material"
 import { useFormik } from "formik"
 import {TextField} from "@mui/material"
 
-function Messagerender({message,userdata}){
+function Messagerender({message,userdata,reRender,setReRender,posted,setPosted}){
     const [editmode,setEditMode]=useState(false)
     const [showResponses,setResponses]=useState(false)
+
     const formik=useFormik({
         initialValues:{
             content:'',
@@ -25,6 +26,8 @@ function Messagerender({message,userdata}){
                 //console.log(response)
                 //console.log(editmode)
                 setEditMode(!editmode)
+                setReRender(!reRender)
+                setPosted(!posted)
             }
         })
       }})
@@ -46,6 +49,8 @@ function Messagerender({message,userdata}){
             }).then((response)=>{
                 if(response.ok){
                     console.log('worked')
+                    setResponses(false)
+                    setPosted(!posted)
                 }
             })
         }
@@ -62,13 +67,15 @@ function Messagerender({message,userdata}){
         function handleDelete(){
             fetch(`/messages/${message.id}`,{
                 method:'DELETE'
+            }).then(()=>{
+                setPosted(!posted)
             })
         }
         function handleClick(){
             setResponses(!showResponses)
         }
         const responses=message.responses.map((data)=>{
-            return <h3 key={data.id}>{data.content}</h3>
+            return <h3 key={data.id} className="flex justify-center">{data.content}</h3>
         })
         if(message.user.id==userdata.id){
             if(editmode===true){
@@ -89,12 +96,47 @@ function Messagerender({message,userdata}){
             if(showResponses==true){
                 return(
                     <div>
-                        <h1 key={message.id} onClick={handleClick}>{message.content}</h1>
-                        <p>You made this one</p>
+                        <h1 key={message.id} onClick={handleClick} className="flex justify-center font-mono font-bold text-lg">{message.content}</h1>
+                        <p className="flex justify-center">You made this one</p>
                         <div>
-                            <h2>Responses</h2>
+                            <h2 className="flex justify-center font-semibold underline">Responses</h2>
                             {responses}
-                            <form onSubmit={responsemaker.handleSubmit}>
+                            <div className="flex justify-center">
+                                <form onSubmit={responsemaker.handleSubmit} className="flex justify-center bg-white w-60">
+                                    <TextField
+                                    id='content'
+                                    label='add a response'
+                                    value={responsemaker.values.content}
+                                    onChange={responsemaker.handleChange}
+                                    />
+                                    <Button variant="contained" type="submit">Submit</Button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
+            return(
+                <div>
+                    <h1 key={message.id} onClick={handleClick} className="flex justify-center text-lg font-mono font-bold">{message.content}</h1>
+                    <p className="flex justify-center">You made this one</p>
+                    <div className="flex justify-center">  
+                        <Button variant="outlined" size="small" onClick={handleEdit}>Edit me</Button>
+                        <Button variant="outlined" size="small" onClick={handleDelete}>Delete me</Button>
+                    </div>
+                </div>  
+            )
+        }
+        if(showResponses==true){
+            return(
+                <div>
+                    <h1 key={message.id} onClick={handleClick} className="flex justify-center font-mono font-bold text-lg">{message.content}</h1>
+                    <p className="flex justify-center">Made by {message.user.username}</p>
+                    <div>
+                        <h2 className="flex justify-center font-semibold underline">Responses</h2>
+                        {responses}
+                        <div className="flex justify-center">
+                            <form onSubmit={responsemaker.handleSubmit} className="flex justify-center bg-white w-60">
                                 <TextField
                                 id='content'
                                 label='add a response'
@@ -105,42 +147,13 @@ function Messagerender({message,userdata}){
                             </form>
                         </div>
                     </div>
-                )
-            }
-            return(
-                <div>
-                    <h1 key={message.id} onClick={handleClick}>{message.content}</h1>
-                    <p>You made this one</p>
-                    <Button variant="outlined" onClick={handleEdit}>Edit me</Button>
-                    <Button variant="outlined" onClick={handleDelete}>Delete me</Button>
-                </div>  
-            )
-        }
-        if(showResponses==true){
-            return(
-                <div>
-                    <h1 key={message.id} onClick={handleClick}>{message.content}</h1>
-                    <p>Made by {message.user.username}</p>
-                    <div>
-                        <h2>Responses</h2>
-                        {responses}
-                        <form onSubmit={responsemaker.handleSubmit}>
-                            <TextField
-                            id='content'
-                            label='add a response'
-                            value={responsemaker.values.content}
-                            onChange={responsemaker.handleChange}
-                            />
-                            <Button variant="contained" type="submit">Submit</Button>
-                        </form>
-                    </div>
                 </div>  
             )
         }
         return(
             <div>
-                <h1 key={message.id} onClick={handleClick}>{message.content}</h1>
-                <p>Made by {message.user.username}</p>
+                <h1 key={message.id} onClick={handleClick} className="flex justify-center font-mono font-bold text-lg">{message.content}</h1>
+                <p className="flex justify-center">Made by {message.user.username}</p>
             </div>
         )
 }

@@ -17,6 +17,8 @@ from models import User,Message,Response
 class Responsesbyid(Resource):
     def delete(self,id):
         response=Response.query.get(id)
+        if not response:
+            return make_response({'error':'No response found'},404)
         db.session.delete(response)
         db.session.commit()
         return make_response('',204)
@@ -25,7 +27,10 @@ api.add_resource(Responsesbyid,'/api/v1/responses/<int:id>')
 class Responses(Resource):
     def post(self):
         data=request.get_json()
-        response=Response(content=data['content'],user_id=data['user_id'],message_id=data['message_id'])
+        try:
+            response=Response(content=data['content'],user_id=data['user_id'],message_id=data['message_id'])
+        except ValueError as v_error:
+            return make_response({'error':[str(v_error)]},400)
         db.session.add(response)
         db.session.commit()
         return make_response({'response':response.to_dict()},201)
@@ -38,7 +43,10 @@ class Messages(Resource):
     
     def post(self):
         data = request.get_json()
-        message=Message(content=data['content'],made_by_user_id=data['made_by_user_id'])
+        try:
+            message=Message(content=data['content'],made_by_user_id=data['made_by_user_id'])
+        except ValueError as v_error:
+            return make_response({'error':[str(v_error)]},400)
         db.session.add(message)
         db.session.commit()
         return make_response({'message':message.to_dict()},201)
@@ -52,13 +60,18 @@ class Messagesbyid(Resource):
     def patch(self,id):
         data=request.json
         message=Message.query.get(id)
-        for attr in data:
-            setattr(message,attr,data[attr])
+        try:
+            for attr in data:
+                setattr(message,attr,data[attr])
+        except ValueError as v_error:
+            return make_response({'error':[str(v_error)]},400)
         db.session.commit()
         return make_response(message.to_dict(),200)
 
     def delete(self,id):
         message=Message.query.get(id)
+        if not message:
+            return({'error':'Message not found'},404)
         db.session.delete(message)
         db.session.commit()
         return make_response('',204)
@@ -71,7 +84,10 @@ class Users(Resource):
 
     def post(self):
         data = request.get_json()
-        user= User(username=data['username'],password_hash=data['password'])
+        try:
+            user= User(username=data['username'],password_hash=data['password'])
+        except ValueError as v_error:
+            return make_response({'error':[str(v_error)]},400)
         db.session.add(user)
         db.session.commit()
         session['user_id']=user.id
@@ -84,6 +100,21 @@ class Usersbyid(Resource):
         user=User.query.get(id)
         if not user:
             return make_response({'error':'User not found'},404)
+        return make_response(user.to_dict(),200)
+
+    def patch(self,id):
+        data=request.json
+        user=User.query.get(id)
+        if not user:
+            return make_response({'error':'User not found'},404)
+        try:
+            for attr in data:
+                setattr(user,attr,data[attr])
+        except ValueError as v_error:
+            return make_response({'error':[str(v_error)]},400)
+        except KeyError as k_error:
+            return make_response({'error':[str(k_error)]},400)
+        db.session.commit()
         return make_response(user.to_dict(),200)
 
     def delete(self,id):
