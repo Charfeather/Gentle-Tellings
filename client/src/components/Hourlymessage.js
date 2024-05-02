@@ -80,7 +80,7 @@ function HourlyMessage({ message, user }) {
     return (
       <div>
         <div className="neumorph_stone">
-          <h1 className="text-3xl font-bold flex justify-center underline">Welcome to Gentle words, here is a message from one of our users</h1>
+          <h1 className="text-3xl font-bold flex justify-center underline">Welcome to Gentle Tellings, here is a message from one of our users</h1>
           <div>
             <h1 onClick={messageId} className="text-2xl font-bold flex justify-center">{message.content}</h1>
           </div>
