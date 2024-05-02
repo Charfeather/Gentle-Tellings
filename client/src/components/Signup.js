@@ -94,7 +94,7 @@ function Signup({setUser}){
             </div>
                 <div className="flex flex-col justify-center">
                     <div className="flex justify-center">
-                        <h1 className="font-mono font-bold text-lg">What is Gentle Words and why do I need an account?</h1>
+                        <h1 className="font-mono font-bold text-lg">What is Gentle Tellings and why do I need an account?</h1>
                     </div>
                     <div className="flex justify-center">
                         <div className="flex justify-center w-3/5">
